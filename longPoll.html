@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Subscriber</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center">Live Updates</h1>
+      <div class="alert alert-info" role="alert" id="status">Connecting...</div>
+      <div class="card mt-3">
+        <div class="card-body" id="updates">Waiting for updates...</div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        const statusElement = document.getElementById("status");
+        const updatesElement = document.getElementById("updates");
+        /*
+         *I had to use event source to subscribe to the server side event with node
+         * here is the docs I read
+         *https://developer.mozilla.org/en-US/docs/Web/API/EventSource
+         * https://www.digitalocean.com/community/tutorials/nodejs-server-sent-events-build-realtime-app
+         *https://www.w3schools.com/html/html5_serversentevents.asp
+         */
+        const eventSource = new EventSource(
+          "http://localhost:8081/subscribe-to-update"
+        );
+
+        eventSource.onopen = () => {
+          statusElement.textContent = "Connected";
+          statusElement.classList.remove("alert-info");
+          statusElement.classList.add("alert-success");
+        };
+
+        eventSource.onmessage = (event) => {
+          updatesElement.textContent = event.data;
+        };
+
+        eventSource.onerror = () => {
+          statusElement.classList.remove("alert-success");
+          statusElement.classList.add("alert-danger");
+        };
+      });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
